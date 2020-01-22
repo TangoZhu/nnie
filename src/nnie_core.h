@@ -24,10 +24,7 @@
 #define SAMPLE_SVP_NNIE_QUANT_BASE 4096
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-static HI_S32 SAMPLE_SVP_NNIE_FillData(const unsigned char* data,
-    SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam, SAMPLE_SVP_NNIE_INPUT_DATA_INDEX_S* pstInputDataIdx);    
+#endif  
 
 static HI_S32 NNIE_Forward(SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam,
     SAMPLE_SVP_NNIE_INPUT_DATA_INDEX_S* pstInputDataIdx,

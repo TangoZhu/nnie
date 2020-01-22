@@ -62,6 +62,7 @@ void NNIE::run(const unsigned char *data)
 
 void NNIE::finish()
 {
+     NNIE_Param_Deinit(s_stNnieParam, s_stModel);
 }
 
 Tensor NNIE::getOutputTensor(int index)
