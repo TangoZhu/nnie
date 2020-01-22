@@ -26,7 +26,6 @@ public:
 public:
     void init(const char *model_path, const int image_height = 416, const int image_width = 416);
     void run(const char *file_path);
-    void run(const char *file_path0, const char *file_path1);
     void run(const unsigned char *data);
     void finish();
     Tensor getOutputTensor(int index);

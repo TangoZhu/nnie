@@ -45,15 +45,9 @@ void NNIE::run(const char *file_path)
     free(data);
 }
 
-void NNIE::run(const char *file_path0, const char *file_path1)
-{
-    // INS_SVP_NNIE_Yolov3_From_path((char*)file_path,(int)_image_width,(int)_image_height);
-    //INS_SVP_TWO_NNIE_Yolov3_From_path((char *)file_path0, (char *)file_path1, (int)_image_width, (int)_image_height);
-}
 
 void NNIE::run(const unsigned char *data)
 {
-    // INS_SVP_NNIE_Yolov3_From_data(data,(int)_image_width,(int)_image_height);
     NNIE_Forward_From_Data(data, &s_stModel_, &s_stNnieParam_, output_tensors_);
 }
 
