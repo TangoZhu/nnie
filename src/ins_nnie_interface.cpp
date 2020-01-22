@@ -4,9 +4,6 @@
 #include "Tensor.h"
 #include "util.h"
 
-namespace insta360
-{
-
 NNIE::NNIE()
 {
 }
@@ -70,5 +67,3 @@ Tensor NNIE::getOutputTensor(int index)
 
     return output_tensors_[index];
 }
-
-} // namespace insta360

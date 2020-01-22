@@ -16,8 +16,6 @@
 #include "Tensor.h"
 #include "sample_comm_nnie.h"
 #define MAX_OUTPUT_NUM 5
-namespace insta360
-{
 
 class NNIE
 {
@@ -45,5 +43,5 @@ protected:
     SAMPLE_SVP_NNIE_PARAM_S s_stNnieParam_ ;
     SAMPLE_SVP_NNIE_CFG_S   stNnieCfg_ ;
 };
-} // namespace insta360
+
 #endif

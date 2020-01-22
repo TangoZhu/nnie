@@ -30,7 +30,7 @@ void Usage(char *pchPrgName)
 
 void yolov3DetectDemo(const char *model_path, const char *image_path)
 {
-    insta360::NNIE yolov3_mnas;
+    NNIE yolov3_mnas;
 
     yolov3_mnas.init(model_path);
 
