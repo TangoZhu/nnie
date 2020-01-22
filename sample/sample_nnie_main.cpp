@@ -26,7 +26,6 @@ void Usage(char *pchPrgName)
     printf("Usage : %s <index> \n", pchPrgName);
     printf("index:\n");
     printf("\t 1) Yolov3(Read File).\n");
-    printf("\t 2) SaliencyDetect(Read File).\n");
 }
 
 void yolov3DetectDemo(const char *model_path, const char *image_path)
@@ -133,7 +132,6 @@ void yolov3DetectDemo(const char *model_path, const char *image_path)
       class 66:remote         class 67:keyboard    class 68:cell phone     class 69:microwave     class 70:oven
       class 71:toaster        class 72:sink        class 73:refrigerator   class 74:book          class 75:clock
       class 76:vase           class 77:scissors    class 78:teddy bear     class 79:hair drier    class 80:toothbrush*/
-    //char *cls_names[] = {"person", "car", "dog"};
     char *cls_names[] = {"background", "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat",
 
                          "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep",
