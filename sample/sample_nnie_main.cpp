@@ -26,6 +26,149 @@ void Usage(char *pchPrgName)
     printf("Usage : %s <index> \n", pchPrgName);
     printf("index:\n");
     printf("\t 1) Yolov3(Read File).\n");
+    printf("\t 2) Yolov2(Read File).\n");
+}
+
+void yolov2DetectDemo(const char *model_path, const char *image_path)
+{
+    NNIE yolov2;
+
+    yolov2.init(model_path);
+
+    printf("yolov2 start\n");
+
+    struct timeval tv1;
+    struct timeval tv2;
+    long t1, t2, time;
+    unsigned char *data = (unsigned char *)malloc(sizeof(unsigned char) * 240 * 80 * 3);
+    cv::Mat img = cv::imread(image_path);
+
+    cv::resize(img, img, cv::Size(240, 80));
+
+    int step = img.step;
+    int h = img.rows;
+    int w = img.cols;
+    int c = img.channels();
+
+    printf("h=%d\n", h);
+    printf("w=%d\n", w);
+    printf("c=%d\n", c);
+
+    unsigned char *data1 = (unsigned char *)img.data;
+    int count = 0;
+    for (int k = 0; k < c; k++)
+    {
+        for (int i = 0; i < h; i++)
+        {
+            for (int j = 0; j < w; j++)
+            {
+                data[count++] = data1[i * step + j * c + k];
+            }
+        }
+    }
+
+    gettimeofday(&tv1, NULL);
+    yolov2.run(data);
+
+    gettimeofday(&tv2, NULL);
+    t1 = tv2.tv_sec - tv1.tv_sec;
+    t2 = tv2.tv_usec - tv1.tv_usec;
+    time = (long)(t1 * 1000 + t2 / 1000);
+    printf("yolov2 NNIE inference time : %dms\n", time);
+
+    gettimeofday(&tv1, NULL);
+
+    Tensor output0 = yolov2.getOutputTensor(0);
+
+    printf("%d\n", output0.width);
+    printf("%d\n", output0.height);
+    printf("%d\n", output0.channel);
+
+    /*yolov2的参数*/
+    int img_width = 240;
+    int img_height = 80;
+    int num_classes = 35;
+    int kBoxPerCell = 2;
+
+    int feature_index0 = 0;
+    int feature_index1 = 1;
+    int feature_index2 = 2;
+
+    float conf_threshold = 0.2;
+    float nms_threshold = 0.2;
+    int is_nms = 1;
+
+    std::vector<int> ids;
+    std::vector<cv::Rect> boxes;
+    std::vector<float> confidences;
+
+    const std::vector<std::vector<cv::Size2f>> anchors = {
+        {{3.638, 5.409}, {3.281, 4.764}}};
+
+    parseYolov2Feature(img_width,
+                       img_height,
+                       num_classes,
+                       kBoxPerCell,
+                       feature_index0,
+                       conf_threshold,
+                       anchors[0],
+                       output0,
+                       ids,
+                       boxes,
+                       confidences);
+
+    std::vector<int> indices;
+
+    char *cls_names[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+                         "K", "L", "M", "N", "P", "Q", "R", "S", "T", "U",
+                         "V", "W", "X", "Y", "Z"};
+
+    std::vector<ObjectDetection> detection_results;
+
+    if (is_nms)
+    {
+        cv::dnn::NMSBoxes(boxes, confidences, conf_threshold, nms_threshold, indices);
+    }
+    else
+    {
+        for (int i = 0; i < boxes.size(); ++i)
+        {
+            indices.push_back(i);
+        }
+    }
+
+    for (size_t i = 0; i < indices.size(); ++i)
+    {
+        int idx = indices[i];
+        cv::Rect box = boxes[idx];
+
+        // remap box in src input size.
+        auto remap_box = RemapBoxOnSrc(cv::Rect2d(box), img_width, img_height);
+        ObjectDetection object_detection;
+        object_detection.box = remap_box;
+        object_detection.cls_id = ids[idx];
+        object_detection.confidence = confidences[idx];
+        detection_results.push_back(std::move(object_detection));
+
+        float xmin = object_detection.box.x;
+        float ymin = object_detection.box.y;
+        float xmax = object_detection.box.x + object_detection.box.width;
+        float ymax = object_detection.box.y + object_detection.box.height;
+        float confidence = object_detection.confidence;
+        int cls_id = object_detection.cls_id;
+        char *cls_name = cls_names[cls_id];
+        printf("%d %s %.3f %.3f %.3f %.3f %.3f\n", cls_id, cls_name, confidence, xmin, ymin, xmax, ymax);
+    }
+
+    gettimeofday(&tv2, NULL);
+    t1 = tv2.tv_sec - tv1.tv_sec;
+    t2 = tv2.tv_usec - tv1.tv_usec;
+    time = (long)(t1 * 1000 + t2 / 1000);
+    printf("yolov2 postProcess time: %dms\n", time);
+    yolov2.finish();
+    free(data);
+    printf("yolov2 finish\n");
 }
 
 void yolov3DetectDemo(const char *model_path, const char *image_path)
@@ -211,6 +354,14 @@ int main(int argc, char *argv[])
         const char *image_path = "./data/nnie_image/test/dog_bike_car.bgr";
         const char *model_path = "./data/nnie_model/detection/inst_yolov3_cycle.wk";
         yolov3DetectDemo(model_path, image_path);
+    }
+    break;
+
+    case '2':
+    {
+        const char *image_path = "./data/nnie_image/test/030.jpg";
+        const char *model_path = "./data/nnie_model/detection/ocr-net_inst.wk";
+        yolov2DetectDemo(model_path, image_path);
     }
     break;
 

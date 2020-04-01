@@ -9,6 +9,7 @@ NNIE::NNIE()
 }
 NNIE::~NNIE()
 {
+    NNIE_Param_Deinit(&s_stNnieParam_, &s_stModel_);
 }
 void NNIE::init(const char *model_path, const int image_height = 416, const int image_width = 416)
 {
@@ -36,7 +37,7 @@ void NNIE::run(const char *file_path)
 
     unsigned char *data = (unsigned char *)malloc(sizeof(unsigned char) * file_length);
 
-    fread(data,file_length,1,fp);
+    fread(data, file_length, 1, fp);
 
     fclose(fp);
 
@@ -45,7 +46,6 @@ void NNIE::run(const char *file_path)
     free(data);
 }
 
-
 void NNIE::run(const unsigned char *data)
 {
     NNIE_Forward_From_Data(data, &s_stModel_, &s_stNnieParam_, output_tensors_);
@@ -53,7 +53,7 @@ void NNIE::run(const unsigned char *data)
 
 void NNIE::finish()
 {
-     NNIE_Param_Deinit(&s_stNnieParam_, &s_stModel_);
+    NNIE_Param_Deinit(&s_stNnieParam_, &s_stModel_);
 }
 
 Tensor NNIE::getOutputTensor(int index)

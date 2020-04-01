@@ -21,10 +21,11 @@
 #include "nnie_core.h"
 #include "Tensor.h"
 
-
-int load_model(const char *model_path, SAMPLE_SVP_NNIE_MODEL_S* s_stModel)
+int load_model(const char *model_path, SAMPLE_SVP_NNIE_MODEL_S *s_stModel)
 {
 
+    /*Sys init*/
+    SAMPLE_COMM_SVP_CheckSysInit();
     HI_S32 s32Ret = SAMPLE_COMM_SVP_NNIE_LoadModel(model_path, s_stModel);
     if (HI_SUCCESS != s32Ret)
     {
@@ -56,7 +57,7 @@ void nnie_param_init(SAMPLE_SVP_NNIE_MODEL_S *s_stModel, SAMPLE_SVP_NNIE_CFG_S *
 * function : Fill Src Data
 ******************************************************************************/
 static HI_S32 NNIE_FillData(const unsigned char *data,
-                                       SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam, SAMPLE_SVP_NNIE_INPUT_DATA_INDEX_S *pstInputDataIdx)
+                            SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam, SAMPLE_SVP_NNIE_INPUT_DATA_INDEX_S *pstInputDataIdx)
 {
     HI_U32 i = 0, j = 0, n = 0;
     HI_U32 u32Height = 0, u32Width = 0, u32Chn = 0, u32Stride = 0, u32Dim = 0;
@@ -155,8 +156,8 @@ static HI_S32 NNIE_FillData(const unsigned char *data,
 }
 
 static HI_S32 NNIE_Forward(SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam,
-                                      SAMPLE_SVP_NNIE_INPUT_DATA_INDEX_S *pstInputDataIdx,
-                                      SAMPLE_SVP_NNIE_PROCESS_SEG_INDEX_S *pstProcSegIdx, HI_BOOL bInstant)
+                           SAMPLE_SVP_NNIE_INPUT_DATA_INDEX_S *pstInputDataIdx,
+                           SAMPLE_SVP_NNIE_PROCESS_SEG_INDEX_S *pstProcSegIdx, HI_BOOL bInstant)
 {
     HI_S32 s32Ret = HI_SUCCESS;
     HI_U32 i = 0, j = 0;
@@ -238,7 +239,7 @@ static HI_S32 NNIE_Forward(SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam,
     return s32Ret;
 }
 
-static HI_S32  NNIE_Get_Result(SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam,Tensor output_tensors[5])
+static HI_S32 NNIE_Get_Result(SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam, Tensor output_tensors[5])
 {
     HI_U32 u32SegNum = pstNnieParam->pstModel->u32NetSegNum;
     HI_U32 i = 0, j = 0, k = 0, n = 0;
@@ -300,24 +301,20 @@ static HI_S32  NNIE_Get_Result(SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam,Tensor outp
                         }
                     }
                 }
-                output_tensors[u32NodeIdx] = t;;
+                output_tensors[u32NodeIdx] = t;
+                ;
             }
         }
     }
     return HI_SUCCESS;
 }
 
-
-
-void NNIE_Forward_From_Data(const unsigned char* data, SAMPLE_SVP_NNIE_MODEL_S* s_stModel,SAMPLE_SVP_NNIE_PARAM_S* s_stNnieParam,Tensor output_tensors[5])
+void NNIE_Forward_From_Data(const unsigned char *data, SAMPLE_SVP_NNIE_MODEL_S *s_stModel, SAMPLE_SVP_NNIE_PARAM_S *s_stNnieParam, Tensor output_tensors[5])
 {
     HI_S32 s32Ret = HI_SUCCESS;
 
     SAMPLE_SVP_NNIE_INPUT_DATA_INDEX_S stInputDataIdx = {0};
     SAMPLE_SVP_NNIE_PROCESS_SEG_INDEX_S stProcSegIdx = {0};
-
-    /*Sys init*/
-    // SAMPLE_COMM_SVP_CheckSysInit();
 
     stInputDataIdx.u32SegIdx = 0;
     stInputDataIdx.u32NodeIdx = 0;
@@ -340,7 +337,7 @@ void NNIE_Forward_From_Data(const unsigned char* data, SAMPLE_SVP_NNIE_MODEL_S* 
 
 NNIE_FORWARD_FAIL_0:
     NNIE_Param_Deinit(s_stNnieParam, s_stModel);
-    SAMPLE_COMM_SVP_CheckSysExit(); 
+    SAMPLE_COMM_SVP_CheckSysExit();
 }
 
 void NNIE_Param_Deinit(SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam, SAMPLE_SVP_NNIE_MODEL_S *pstNnieModel)
@@ -362,4 +359,3 @@ void NNIE_Param_Deinit(SAMPLE_SVP_NNIE_PARAM_S *pstNnieParam, SAMPLE_SVP_NNIE_MO
                                     "Error,SAMPLE_COMM_SVP_NNIE_UnloadModel failed!\n");
     }
 }
-
